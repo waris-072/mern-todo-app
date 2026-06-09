@@ -7,8 +7,11 @@ function App(){
   const [editId, setEditId] = useState(null);
   const [filter, setFilter] = useState("all");
 
+  const BASE_URL = import.meta.env.VITE_API_URL;
+  //backend is deployed on railway. You can also run it locally by changing the BASE_URL to "http://localhost:5000"
+
   const fetchTodos = () =>{
-    fetch("http://localhost:5000/todos")
+    fetch(`${BASE_URL}/todos`)
     .then(res => res.json())
     .then(data => setTodos(data));
   }
@@ -20,7 +23,7 @@ function App(){
 const addTodo = () => {
   if (!title.trim()) return;
 
-  fetch("http://localhost:5000/todos", {
+  fetch(`${BASE_URL}/todos`, {
     method: "POST",
     headers: {
       "content-type": "application/json"
@@ -45,7 +48,7 @@ const addTodo = () => {
 
   //Delete todo
   const dltTodo = (id) =>{
-    fetch(`http://localhost:5000/todos/${id}`,{
+    fetch(`${BASE_URL}/todos/${id}`,{
       method:"DELETE"
     })
     .then(res => res.json())
@@ -57,7 +60,7 @@ const addTodo = () => {
   //update Todo
   const updateTodo = () =>{
 
-    fetch(`http://localhost:5000/todos/${editId}`,{
+    fetch(`${BASE_URL}/todos/${editId}`,{
       method:"PUT",
       headers: {
         "content-type": "application/json"
@@ -79,7 +82,7 @@ const addTodo = () => {
 
   //toggle todo
   const toggleTodo = (id) =>{
-    fetch(`http://localhost:5000/todos/toggle/${id}`,{
+    fetch(`${BASE_URL}/todos/toggle/${id}`,{
       method:"PUT"
     })
     .then(res => res.json())
