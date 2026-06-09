@@ -17,22 +17,31 @@ function App(){
   },[]);
 
   //Add todo
-  const addTodo = ()=>{
-    if(!title) return;
-    
-    fetch("http://localhost:5000/todos",{
-      method:"POST",
-      headers: {
-        "content-type":"application/json"
-      },
-      body: JSON.stringify({title})
-    })
-    .then(res => res.json())
-    .then(()=>{
-      setTitle("");
-      fetchTodos();
-    })
-  }
+const addTodo = () => {
+  if (!title.trim()) return;
+
+  fetch("http://localhost:5000/todos", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({ title })
+  })
+  .then(async (res) => {
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || "Request failed");
+    }
+    return data;
+  })
+  .then((newTodo) => {
+    setTodos(prev => [...prev, newTodo]);
+    setTitle("");
+  })
+  .catch(err => {
+    console.log("Error:", err.message);
+  });
+};
 
   //Delete todo
   const dltTodo = (id) =>{
@@ -40,12 +49,14 @@ function App(){
       method:"DELETE"
     })
     .then(res => res.json())
-    .then(()=> fetchTodos())
+    .then(() => {
+      setTodos(prev => prev.filter(todo => todo._id !== id));
+    });
   }
 
   //update Todo
   const updateTodo = () =>{
-    if(!title.trim()) return;
+
     fetch(`http://localhost:5000/todos/${editId}`,{
       method:"PUT",
       headers: {
@@ -54,11 +65,16 @@ function App(){
       body: JSON.stringify({title})
     })
     .then(res => res.json())
-    .then(() =>{
+    .then((updatedTodo) => {
+      setTodos(prev =>
+        prev.map(todo =>
+          todo._id === updatedTodo._id ? updatedTodo : todo
+        )
+      );
+
       setEditId(null);
       setTitle("");
-      fetchTodos();
-    })
+    });
   };
 
   //toggle todo
@@ -67,9 +83,11 @@ function App(){
       method:"PUT"
     })
     .then(res => res.json())
-    .then(()=>{
-      fetchTodos()
-    })
+    .then((toggledTodo) => {
+      setTodos(prev =>
+        prev.map(todo => todo._id === toggledTodo._id ? toggledTodo : todo)
+      );
+    });
   };
 
   const fileteredTodos = todos.filter(todo => {
@@ -115,7 +133,7 @@ function App(){
                 checked={todo.completed} 
                 onChange={()=> toggleTodo(todo._id)}
               />
-              <span style={{textDecoration: todo.completed ? "line-through" : "none"}}>{todo.title.toUpperCase()}</span>
+              <span style={{textDecoration: todo.completed ? "line-through" : "none"}}>{todo?.title ? todo.title.toUpperCase() : "INVALID TODO"}</span>
 
               <div className="actions">
                 <button onClick={()=> {setEditId(todo._id); setTitle(todo.title);}}>

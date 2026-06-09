@@ -60,3 +60,8 @@ backendApi/
 * Managing application state
 * Working with MongoDB and Mongoose
 * Understanding full-stack application architecture
+
+
+atlas password:        meRnDb@mongodB
+
+mongodb+srv://mernDbUser:meRnDb@mongodB@cluster0.liqn1jj.mongodb.net/todoDB

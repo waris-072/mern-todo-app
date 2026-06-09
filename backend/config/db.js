@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
     try {
-        await mongoose.connect("mongodb://127.0.0.1:27017/todoDB");
-
+        await mongoose.connect(process.env.MONGO_URI);
+        // await mongoose.connect("mongodb://127.0.0.1:27017/todoDB");
+        
         console.log("MongoDB Connected");
     } catch (error) {
         console.log("DB Connection Failed", error);

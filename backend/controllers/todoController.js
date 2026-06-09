@@ -1,53 +1,72 @@
-const Todo = require("../models/Todo");
+const Todo = require("../models/Todo");  //schema for todo model
 
 // GET
 const getTodos = async (req, res) => {
-    const todos = await Todo.find();
-    res.json(todos);
+    try{
+        const todos = await Todo.find();
+        res.status(200).json(todos);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 // POST
 const addTodo = async (req, res) => {
-    const todo = await Todo.create({
-        title: req.body.title
-    });
-
-    res.json(todo);
+    try {
+        const todo = await Todo.create({
+            title: req.body.title
+        });
+        res.status(201).json(todo);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 // DELETE
 const deleteTodo = async (req, res) => {
-    const todo = await Todo.findByIdAndDelete(req.params.id);
+    try {
+        const todo = await Todo.findByIdAndDelete(req.params.id);
 
-    res.json({
-        message: "Deleted",
-        data: todo
-    });
+        res.status(200).json({
+            message: "Deleted",
+            data: todo
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 // UPDATE
 const updateTodo = async (req, res) => {
-    const todo = await Todo.findByIdAndUpdate(
+    try {
+        const todo = await Todo.findByIdAndUpdate(
         req.params.id,
         { title: req.body.title },
         { new: true }
     );
 
-    res.json(todo);
+        res.status(200).json(todo);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 // TOGGLE
 const toggleTodo = async (req, res) => {
-    const { id } = req.params;
-    const todo = await Todo.findById(id);
+    try {
+        const { id } = req.params;
+        const todo = await Todo.findById(id);
 
-    if (!todo) {
-        return res.status(404).json({ message: "Todo not found" });
+        if (!todo) {
+            return res.status(404).json({ message: "Todo not found" });
+        }
+
+        todo.completed = !todo.completed;
+        await todo.save();
+        res.status(200).json(todo);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-
-    todo.completed = !todo.completed;
-    await todo.save();
-    res.json(todo);
 };
 
 module.exports = {
